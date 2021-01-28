@@ -28,7 +28,7 @@ export const routes = ({ errors, models, logger }) => {
     res.setHeader('Content-Type', 'application/json')
     const nrp = new NoteResultProcessor(new KB(getOrigin()))
     // FIXME why do existing note queries resolve user first?
-    const sr = new RegExp(`\\b${decodeURIComponent(search)}`, 'i');
+    const sr = new RegExp(`\\b${decodeURIComponent(search)}`, 'ig');
     const found = await getNotesById(models, req.user.id);
     const results = {};
     for (const note of found) {
