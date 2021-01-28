@@ -50,6 +50,5 @@
         "preversion": "npm run lint",
         "version": "npm run format && git add -A src"
     },
-    "author": "vid",
-    "type": "module"
+    "author": "vid"
 }
