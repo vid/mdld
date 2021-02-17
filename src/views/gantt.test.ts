@@ -61,7 +61,7 @@ describe('Gantt diagram', () => {
        t1                  : t1_23s1, 1965-06-01,  4
 
        click t3_23s3 call clickTask("%7B%22date%22:%221964-01-01T05:00:00.000Z%22,%22subject%22:%22t3#s3%22,%22predicate%22:%22date%22,%22object%22:%221964%22,%22source%22:%22/test%22,%22blank%22:true,%22_type%22:%22Numeric%22%7D")
-       click t2_23s2 call clickTask("%7B%22date%22:%221964-09-22T05:00:00.000Z%22,%22subject%22:%22t2#s2%22,%22predicate%22:%22date%22,%22object%22:%22Fall%201964%22,%22source%22:%22/test%22,%22blank%22:true,%22_type%22:%22Text%22%7D")
-       click t1_23s1 call clickTask("%7B%22date%22:%221965-06-01T05:00:00.000Z%22,%22subject%22:%22t1#s1%22,%22predicate%22:%22date%22,%22object%22:%22June%201,%201965%22,%22source%22:%22/test%22,%22blank%22:true,%22_type%22:%22Text%22%7D")`);
+       click t2_23s2 call clickTask("%7B%22date%22:%221964-09-22T04:00:00.000Z%22,%22subject%22:%22t2#s2%22,%22predicate%22:%22date%22,%22object%22:%22Fall%201964%22,%22source%22:%22/test%22,%22blank%22:true,%22_type%22:%22Text%22%7D")
+       click t1_23s1 call clickTask("%7B%22date%22:%221965-06-01T04:00:00.000Z%22,%22subject%22:%22t1#s1%22,%22predicate%22:%22date%22,%22object%22:%22June%201,%201965%22,%22source%22:%22/test%22,%22blank%22:true,%22_type%22:%22Text%22%7D")`);
   });
 });

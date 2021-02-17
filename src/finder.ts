@@ -204,8 +204,8 @@ export default class Finder {
     if (type === 'matching') hitFinder = (where, what) => where.toLowerCase() === what.toLowerCase();
     if (type === 'from')
       hitFinder = (where, what) => {
-        if (what.length < 3) {
-          throw Error('From length must be greater than 2');
+        if (what.length < 2) {
+          throw Error('From length must be greater than 1');
         }
         // always accept absolute path
         if (where.startsWith(what)) {
