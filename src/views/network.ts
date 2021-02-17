@@ -1,54 +1,38 @@
-import { Network } from 'vis-network/peer';
-import { DataSet } from 'vis-data/peer';
+import { Network } from 'vis-network';
+import { DataSet } from 'vis-data';
 
 import { display, flattenHits } from '../util';
+import finder, { TFindResult } from '../finder';
 
-export function generateNetwork(results, finder, where) {
+export function generateNetwork(results: TFindResult, finder: finder, where: string) {
   return {
     output: `<div style="min-height: 800px">
 <div style="height: 800px" id="${where}"></div>
 <h2 id="eventSpanContent"></h2>
 <pre id="eventSpanHeading"></pre>
-</div>`, after
+</div>`,
+    after,
   };
   function after() {
-    const f = flattenHits(results.found);
-
-    const cache = {};
-    let seq = 0;
-    let nodes = [];
-    const createLabel = (key) => ( key).replace(/.*\//, '').replace(/.*#/, '');
-
-    const createNodeWithId = (key, label?, title?) => {
-      if (cache[key]) {
-        return cache[key];
-      }
-      seq++;
-      cache[key] = seq;
-      nodes.push({ id: seq, label: label || createLabel(key), title, subject: key });
-      return seq;
-    }
-
-    f.forEach(i => {
-      createNodeWithId(i.subject, createLabel(i.subject), i.object);
-    });
-    let edges = f.map(i => {
-      const to = createNodeWithId(i.object);
-      const from = createNodeWithId(i.subject);
-      return { from, to, label: i.predicate }
-    });
+    let { nodes, edges } = resultsToNodesAndEdges(results);
 
     const data = { nodes: new DataSet(nodes), edges: new DataSet<any>(edges) };
 
     const container = document.getElementById(where);
 
-    const network = new Network(container, data, { interaction: { hover: true }, edges: { arrows: 'to' } });
+    const network = new Network(container, data, {
+      interaction: { hover: true },
+      nodes: { shape: 'box' },
+      edges: { arrows: 'to' },
+    });
 
-    network.on("click", function (params) {
+    network.on('click', function (params) {
       var ids = params.nodes;
       var clickedNodes = data.nodes.get(ids);
       console.log('clicked nodes:', clickedNodes);
-      document.getElementById("eventSpanHeading").innerHTML = clickedNodes.map(c => display(finder, c, 'subject')).join(' ');
+      document.getElementById('eventSpanHeading').innerHTML = clickedNodes
+        .map((c) => display(finder, c, 'subject'))
+        .join(' ');
       // document.getElementById("eventSpanContent").innerText = JSON.stringify(
       //   params,
       //   null,
@@ -185,4 +169,34 @@ export function generateNetwork(results, finder, where) {
     });
     */
   }
+}
+
+export function resultsToNodesAndEdges(results: TFindResult) {
+  const f = flattenHits(results.found);
+  const cache = {};
+  let seq = 0;
+  let nodes = [];
+  const createLabel = (key) => key.replace(/.*\//, '').replace(/.*#/, '');
+
+  const createNodeWithId = (fkey, label?, title?) => {
+    // normalize to kebab case because anchors use them
+    const key = fkey.replace(/.*#/, '').replace(/ /g, '-').toLowerCase();
+    if (cache[key]) {
+      return cache[key];
+    }
+    seq++;
+    cache[key] = seq;
+    nodes.push({ id: seq, label: label || createLabel(fkey.replace(/.*#/, '')), title, subject: key });
+    return seq;
+  };
+
+  f.forEach((i) => {
+    createNodeWithId(i.subject, createLabel(i.subject), i.object);
+  });
+  let edges = f.map((i) => {
+    const to = createNodeWithId(i.object);
+    const from = createNodeWithId(i.subject);
+    return { from, to, label: i.predicate };
+  });
+  return { nodes, edges };
 }
