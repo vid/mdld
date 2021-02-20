@@ -158,6 +158,7 @@ function updateLinks() {
   if (qdkb.statements[noteId]) {
     currentPath = finder.findNotePath(noteId);
   }
+  const noDest = [];
   anchors.forEach((anchor) => {
     let href = anchor.getAttribute('href').replace(document.location.origin, '');
     if (href.startsWith('#') || href.indexOf('://') > 0) {
@@ -177,9 +178,10 @@ function updateLinks() {
       anchor.href = dest + document.location.search;
     } else {
       // it's not found or already mapped
-      console.info('no dest', dest, href);
+      noDest.push({dest, href});
     }
   });
+  noDest.length && console.info('no dest', noDest);
 }
 
 export function applyToPathTitle(func: (any) => void) {
@@ -277,7 +279,6 @@ export async function bootmdld(md) {
   }
   // md.use(abbr)
   md.use(mdldRender); // needed to render link values
-  console.log(queryTagPlugin);
   md.use(queryTagPlugin);
 
   md.ldrender = (content) => {
