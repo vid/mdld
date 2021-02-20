@@ -9,10 +9,11 @@ export {};
 const test = `# Heading one
 
 [:linksTo](<Heading two>)
+[:n-shape](circle)
 
 # Heading two
 
-[:linksTo](<Heading one>)
+[:linksTo](<Heading-one>)
 
 # Heading three
 
@@ -33,20 +34,21 @@ describe('generate network', () => {
     expect(nodes).toEqual([
       {
         id: 1,
-        label: 'heading-one',
+        label: 'heading one',
+        shape: 'circle',
         title: 'Heading two',
         subject: 'heading-one',
       },
       {
         id: 2,
-        label: 'heading-two',
+        label: 'heading two',
         title: 'Heading one',
         subject: 'heading-two',
       },
       {
         id: 3,
-        label: 'heading-three',
-        title: 'Heading-two',
+        label: 'heading three',
+        title: 'Heading two',
         subject: 'heading-three',
       },
     ]);

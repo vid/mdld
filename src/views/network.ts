@@ -4,6 +4,57 @@ import { DataSet } from 'vis-data';
 import { display, flattenHits } from '../util';
 import finder, { TFindResult } from '../finder';
 
+const createLabel = (key) => key.replace(/.*\//, '').replace(/.*#/, '').replace(/-/g, ' ');
+
+// normalize to kebab case because anchors use them
+const idAsKey = (fkey) => fkey.replace(/.*#/, '').replace(/ /g, '-').toLowerCase();
+
+export function resultsToNodesAndEdges(results: TFindResult) {
+  const f = flattenHits(results.found);
+  const cache = {};
+  let seq = 0;
+  let nodes = [];
+
+  const getOrCreateNodeWithId = (fkey, labelIn?, titleIn?) => {
+    const key = idAsKey(fkey);
+    if (cache[key]) {
+      return cache[key];
+    }
+    seq++;
+    cache[key] = seq;
+    const label = labelIn || createLabel(fkey);
+    const title = titleIn ? createLabel(titleIn) : label;
+    nodes.push({ id: seq, label, title, subject: key });
+    return seq;
+  };
+  const updateNodeWithId = (fkey, type, value) => {
+    const id = cache[idAsKey(fkey)];
+    const toUpdate = nodes.find((n) => n.id === id);
+    if (toUpdate) toUpdate[type] = value;
+  };
+
+  f.forEach((i) => {
+    getOrCreateNodeWithId(i.subject, createLabel(i.subject), i.object);
+  });
+  let edges = f
+    .filter((i) => {
+      if (i.predicate.startsWith('n-')) {
+        updateNodeWithId(i.subject, i.predicate.replace('n-', ''), i.object);
+        return false;
+      }
+      return true;
+    })
+    .map((i) => {
+      const to = getOrCreateNodeWithId(i.object);
+      
+      const from = getOrCreateNodeWithId(i.subject);
+      
+      return { from, to, label: i.predicate };
+    });
+    
+  return { nodes, edges };
+}
+
 export function generateNetwork(results: TFindResult, finder: finder, where: string) {
   return {
     output: `<div style="min-height: 800px">
@@ -169,34 +220,4 @@ export function generateNetwork(results: TFindResult, finder: finder, where: str
     });
     */
   }
-}
-
-export function resultsToNodesAndEdges(results: TFindResult) {
-  const f = flattenHits(results.found);
-  const cache = {};
-  let seq = 0;
-  let nodes = [];
-  const createLabel = (key) => key.replace(/.*\//, '').replace(/.*#/, '');
-
-  const createNodeWithId = (fkey, label?, title?) => {
-    // normalize to kebab case because anchors use them
-    const key = fkey.replace(/.*#/, '').replace(/ /g, '-').toLowerCase();
-    if (cache[key]) {
-      return cache[key];
-    }
-    seq++;
-    cache[key] = seq;
-    nodes.push({ id: seq, label: label || createLabel(fkey.replace(/.*#/, '')), title, subject: key });
-    return seq;
-  };
-
-  f.forEach((i) => {
-    createNodeWithId(i.subject, createLabel(i.subject), i.object);
-  });
-  let edges = f.map((i) => {
-    const to = createNodeWithId(i.object);
-    const from = createNodeWithId(i.subject);
-    return { from, to, label: i.predicate };
-  });
-  return { nodes, edges };
 }
