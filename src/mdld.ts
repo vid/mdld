@@ -63,7 +63,7 @@ export const mdld = (md, opts: { heading?: string } = {}) => {
             const schema = schemaIn?.replace(/\;.*/, '');
             let fullschema = kb.withSchema(schema, location, inType || guessType(value));
             const [subject, predicate, object] = [label || source, fullschema, value];
-            kb.addQuad({ subject: withFragment(subject), predicate, object, source, blank: label });
+            kb.addQuad({ subject: withFragment(subject), predicate, object, source, blank: !!label });
           }
         });
       }
