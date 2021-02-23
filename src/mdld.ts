@@ -1,5 +1,13 @@
 const { windowDoc, guessType, uriPath } = require('./util');
 
+const getLabelSchemaType = (content) => {
+  if (content.indexOf(':') > -1) {
+    return content.split(/:(?!\/)/);
+  }
+
+  return [content, 'link', undefined];
+};
+
 export const mdld = (md, opts: { heading?: string } = {}) => {
   md.core.ruler.after('inline', 'mdld-link', function (state) {
     const { kb }: { kb } = md.options;
@@ -49,13 +57,13 @@ export const mdld = (md, opts: { heading?: string } = {}) => {
               return false;
             }
             const { content } = token;
-            const [label, schemaIn, inType] =
-              content.indexOf(':') > -1 ? content.split(/:(?!\/)/) : [content, 'link', undefined];
+            const [label, schemaIn, inType] = getLabelSchemaType(content);
+
             const location = uriPath(source);
             const schema = schemaIn?.replace(/\;.*/, '');
             let fullschema = kb.withSchema(schema, location, inType || guessType(value));
             const [subject, predicate, object] = [label || source, fullschema, value];
-            kb.addQuad({ subject: withFragment(subject), predicate, object, source, blank: !!label });
+            kb.addQuad({ subject: withFragment(subject), predicate, object, source, blank: label });
           }
         });
       }
