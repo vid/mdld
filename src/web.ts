@@ -32,7 +32,13 @@ export const switchables = {};
 const formatResult = ({ noteId, result, type }, cutPath) => {
   const path = finder.findNotePath(noteId);
   const title = result.hits
-    ? result.hits.map((f) => `${f.field}: ${f.text || f.quad[f.field]}`).join('\n')
+    ? result.hits.reduce((all, f) => {
+      if (f.fields) {
+        return [...all, ...f.fields.map(x => `${x}: ${f.quad[x]}`)];
+      } else {
+        return [...all, `${f.field}: ${f.text || f.quad[f.field]}`];
+      }
+    }, []).join('\n')
     : 'text result';
   return `<a title="${title}" class="path-note-match path-note-match-${type}" href="${noteId}${
     document.location.search
