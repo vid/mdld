@@ -46,12 +46,12 @@ export function resultsToNodesAndEdges(results: TFindResult) {
     })
     .map((i) => {
       const to = getOrCreateNodeWithId(i.object);
-      
+
       const from = getOrCreateNodeWithId(i.subject);
-      
+
       return { from, to, label: i.predicate };
     });
-    
+
   return { nodes, edges };
 }
 

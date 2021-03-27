@@ -43,7 +43,9 @@ export const encodeNoteId = (id) => {
 };
 
 export function flattenHits(found: MetaResultMap): Quad[] {
-  const f = Object.keys(found).reduce((all, i) => [...all, ...(found[i].hits as QuadHit[]).map((q) => q.quad)], []);
+  const f = Object.keys(found).reduce((all, i) => {
+    return [...all, ...(found[i].hits as QuadHit[]).map((q) => q.quad)];
+  }, []);
   return f;
 }
 

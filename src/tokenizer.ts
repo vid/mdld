@@ -1,4 +1,3 @@
-
 export class Tokenizer {
   s: string;
   constructor(s: string) {
@@ -29,6 +28,5 @@ export class Tokenizer {
     const nextToken = this.s.substr(0, nextSpace);
     this.s = this.s.substr(nextSpace + 1);
     return nextToken;
-
   }
 }

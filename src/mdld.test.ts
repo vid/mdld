@@ -1,5 +1,5 @@
 const { mdld } = require('./mdld');
-const { KB } = require("./KB");
+const { KB } = require('./KB');
 
 describe('non blank quad', () => {
   it('finds property', () => {
@@ -7,7 +7,7 @@ describe('non blank quad', () => {
     const md = require('markdown-it')({ kb }).use(mdld);
     kb.source = '/test';
     md.render('[:test](1)');
-    expect(kb.statements['/test'].mdld[0].blank).toBe(false); 
+    expect(kb.statements['/test'].mdld[0].blank).toBe(false);
   });
 
   it('finds blank', () => {
@@ -22,11 +22,16 @@ describe('non blank quad', () => {
     const md = require('markdown-it')({ kb }).use(mdld);
     kb.source = '/test';
     md.render('[a label:test](1)');
-    expect(kb.statements['/test'].mdld[0]).toEqual({"_type": "Numeric", "blank": true, "object": "1", "predicate": "test", "source": "/test", "subject": "a label"});
+    expect(kb.statements['/test'].mdld[0]).toEqual({
+      _type: 'Numeric',
+      blank: true,
+      object: '1',
+      predicate: 'test',
+      source: '/test',
+      subject: 'a label',
+    });
   });
 });
-
-
 
 describe('statements and schemas', () => {
   const tests = {
@@ -48,7 +53,7 @@ Paragraph.
     'https://nicer.info/test/datestring': '[test:rdate](<Sept 4, 2020>)',
     'https://nicer.info/test/broken': '[test:broken](to nowhere)',
     'https://nicer.info/test/link': '[some link](somewhere)',
-    'https://somewhere.else/test/link': '[offsite link](elsewhere)'
+    'https://somewhere.else/test/link': '[offsite link](elsewhere)',
   };
 
   const kb = new KB('https://nicer.info');
@@ -67,13 +72,12 @@ Paragraph.
     expect(Object.keys(kb.schemas).length).toBe(6);
   });
   it('schemas have the correct types', () => {
-    Object.keys(kb.schemas).forEach(schema => {
+    Object.keys(kb.schemas).forEach((schema) => {
       expect(schema.endsWith(kb.schemas[schema].type.toLowerCase()));
     });
   });
 
   it('localizes source', () => {
-    expect(kb.statementsAsQuads().filter(q => q.source.includes('://')).length).toBe(1)
+    expect(kb.statementsAsQuads().filter((q) => q.source.includes('://')).length).toBe(1);
   });
 });
-

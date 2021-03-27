@@ -32,13 +32,15 @@ export const switchables = {};
 const formatResult = ({ noteId, result, type }, cutPath) => {
   const path = finder.findNotePath(noteId);
   const title = result.hits
-    ? result.hits.reduce((all, f) => {
-      if (f.fields) {
-        return [...all, ...f.fields.map(x => `${x}: ${f.quad[x]}`)];
-      } else {
-        return [...all, `${f.field}: ${f.text || f.quad[f.field]}`];
-      }
-    }, []).join('\n')
+    ? result.hits
+        .reduce((all, f) => {
+          if (f.fields) {
+            return [...all, ...f.fields.map((x) => `${x}: ${f.quad[x]}`)];
+          } else {
+            return [...all, `${f.field}: ${f.text || f.quad[f.field]}`];
+          }
+        }, [])
+        .join('\n')
     : 'text result';
   return `<a title="${title}" class="path-note-match path-note-match-${type}" href="${noteId}${
     document.location.search
@@ -184,7 +186,7 @@ function updateLinks() {
       anchor.href = dest + document.location.search;
     } else {
       // it's not found or already mapped
-      noDest.push({dest, href});
+      noDest.push({ dest, href });
     }
   });
   noDest.length && console.info('no dest', noDest);

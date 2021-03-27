@@ -1,6 +1,4 @@
-
 import { Tokenizer } from './tokenizer';
-
 
 describe('tokenizer', () => {
   test('tokenizes single token', () => {
@@ -41,7 +39,5 @@ describe('tokenizer', () => {
       threw = true;
     }
     expect(threw).toBe(true);
-
-  })
-
+  });
 });

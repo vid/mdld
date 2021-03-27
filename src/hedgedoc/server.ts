@@ -1,4 +1,3 @@
-
 import { MetaResultMap, TextHit } from '../defs';
 import { KB } from '../KB';
 
@@ -10,23 +9,23 @@ export const getOrigin = () => {
     return undefined;
   }
   return (process.env.CMD_PROTOCOL_USESSL === 'true' ? 'https' : 'http') + `://${process.env.CMD_DOMAIN}`;
-}
+};
 export const routes = ({ errors, models, logger }) => {
   // FIXME there is probably a better way to do this
   const meNotes = async (req, res) => {
-    res.setHeader('Content-Type', 'application/json')
+    res.setHeader('Content-Type', 'application/json');
     const nrp = new NoteResultProcessor(new KB(getOrigin()));
     const found = await getNotesById(models, req.user.id);
     let noteData: MetaResultMap = {};
     for (const note of found) {
-      const { noteId, meta } = nrp.process(note)
-      noteData[noteId] = meta
+      const { noteId, meta } = nrp.process(note);
+      noteData[noteId] = meta;
     }
     res.json({ noteData, schemas: nrp.kb.schemas });
-  }
+  };
   const meNoteSearch = async (req, res, search) => {
-    res.setHeader('Content-Type', 'application/json')
-    const nrp = new NoteResultProcessor(new KB(getOrigin()))
+    res.setHeader('Content-Type', 'application/json');
+    const nrp = new NoteResultProcessor(new KB(getOrigin()));
     // FIXME why do existing note queries resolve user first?
     const sr = new RegExp(`\\b${decodeURIComponent(search)}`, 'ig');
     const found = await getNotesById(models, req.user.id);
@@ -37,7 +36,7 @@ export const routes = ({ errors, models, logger }) => {
         const hits: TextHit[] = [];
         const { noteId, meta } = nrp.process(note as any);
         for (const match of matches) {
-          const text = htmlsafe(note.content.substr(match.index, 32))
+          const text = htmlsafe(note.content.substr(match.index, 32));
           hits.push({ field: 'text', text });
         }
         meta.hits = hits;
@@ -45,23 +44,23 @@ export const routes = ({ errors, models, logger }) => {
       }
     }
     res.json(results);
-  }
+  };
   const getNotesById = async (models, id) => {
     const notes = await models.Note.findAll({ where: { ownerId: id } });
     const found: any[] = await Promise.all(notes);
     return found;
-  }
+  };
   const ifAuthn = (what: Function) => {
     return (req, res, ...rest) => {
       if (!req.isAuthenticated()) {
         logger('forbidden');
-        return errors.errorForbidden(res)
+        return errors.errorForbidden(res);
       }
       what(...[req, res, ...rest]);
-    }
-  }
+    };
+  };
   return {
     meNotes: ifAuthn(meNotes),
-    meNoteSearch: ifAuthn(meNoteSearch)
-  }
+    meNoteSearch: ifAuthn(meNoteSearch),
+  };
 };

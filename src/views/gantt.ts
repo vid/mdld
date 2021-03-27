@@ -14,8 +14,6 @@ export function generateGantt(results, finder) {
         startOnLoad: true,
       });
       mermaid.contentLoaded();
-    }
-  }
+    },
+  };
 }
-
-
