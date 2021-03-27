@@ -52,9 +52,19 @@ test('findPathNotes', () => {
 });
 
 // queries
+test('A table using "using"', () => {
+  const finder = new Finder(kb);
+  const { found } = finder.find('A table using todo');
+  expect(Object.keys(found).length).toBe(3);
+  
+  expect(found['/werk/w1'].hits.length).toBe(1);
+  expect(found['/werk/w2'].hits.length).toBe(2);
+  expect(found['/home/h1'].hits.length).toBe(2);
+});
 test('A table using "matching"', () => {
   const finder = new Finder(kb);
   const { found } = finder.find('A table matching follow-up');
+ 
   expect(Object.keys(found).length).toBe(3);
   expect(found['/werk/w1'].hits.length).toBe(2);
   expect(found['/werk/w2'].hits.length).toBe(1);

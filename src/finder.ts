@@ -1,5 +1,5 @@
-import { KB, allFields } from './KB';
-import { QuadHit, MetaResultMap, Field } from './defs';
+import { allFields } from './KB';
+import { QuadHit, MetaResultMap, Field, FindHit } from './defs';
 import { Tokenizer } from './tokenizer';
 
 type Findist = { type: string; inFields: Field[]; q: string };
@@ -27,7 +27,7 @@ export default class Finder {
   find(qs: string): TFindResult {
     const { statements } = this.kb;
     const tokens = new Tokenizer(
-      qs.replace(/^An? /, '').replace(/, /g, ',').replace(/\s\s+/g, ' ').replace(/: /g, ':').trim()
+      qs.replace(/^An? /, '').replace(/, /g, ',').replace(/\s\s+/g, ' ').replace(/: /g, ':').trim(),
     );
     const output = [];
     let name;
@@ -37,7 +37,6 @@ export default class Finder {
     let last;
     let findists: Findist[] = [];
     let filters: Filter[] = [];
-    let using: string[] = [];
     const addFindist = (type, findist) => {
       last = type;
       const includesField = findist.includes(':');
@@ -53,10 +52,10 @@ export default class Finder {
       }
     };
     const addFilter = (type, q, exclude?) => {
-      last = type;
       if (!q) {
         throw Error(`missing q from ${q}`);
       }
+      last = type;
       const newFilter = { type, q, exclude };
       if (inConcept) {
         this.kb.concepts[name].filters.push(newFilter);
@@ -90,11 +89,11 @@ export default class Finder {
         including = including.split(',').map((i) => i.trim());
       } else if (t === 'using') {
         // always overwrites
-        using = tokens.next().split(',');
+        const using = tokens.next().split(',');
         addFilter(t, using);
       } else if (t === 'without') {
         // always overwrites
-        using = tokens.next().split(',');
+        const using = tokens.next().split(',');
         addFilter(t, using, true);
       } else {
         console.error('unknown directive', t, qs, tokens);
@@ -102,9 +101,14 @@ export default class Finder {
       }
     }
     let found: MetaResultMap = statements;
-    findists.forEach((findist) => {
-      found = this.findMatches(found, findist);
-    });
+
+    if (findists.length) {
+      findists.forEach((findist) => {
+        found = this.findMatches(found, findist);
+      });
+    } else {
+      found = this.populateHitsFromMdld(found);
+    }
 
     filters.forEach((filter) => {
       found = this.filter(found, filter);
@@ -114,52 +118,23 @@ export default class Finder {
   }
 
   filter(found: MetaResultMap, { type, exclude, q: filter }: Filter): MetaResultMap {
-    Object.entries(found).forEach(([f, r]) => {
-      const newHits = ((<unknown>r.hits) as QuadHit[])?.reduce((all, h) => {
-        if (filter.includes(h.quad.predicate)) {
+    Object.entries(found).forEach(([, r]) => {
+      const newHits = ((r.hits))?.reduce((all, h) => {
+        if (filter.includes((h as QuadHit).quad.predicate)) {
           if (exclude) {
             return all;
           }
           return [...all, h];
-        } else {
-          if (exclude) {
-            return [...all, h];
-          }
-          return all;
         }
+        if (exclude) {
+          return [...all, h];
+        }
+        return all;
       }, []);
       r.hits = newHits;
     });
 
     return found;
-  }
-
-  findFromMdld({ statements, q, inFields, noteId, hitFinder }: HitFinder) {
-    let hits: QuadHit[] = [];
-    statements[noteId].mdld.forEach((quad) => {
-      let fields = [];
-      inFields.forEach((field) => {
-        if (hitFinder(quad[field], q)) {
-          fields.push(field);
-        }
-      });
-      if (fields.length > 0) {
-        hits.push({ fields, quad });
-      }
-    });
-    return hits;
-  }
-
-  findFromHits({ statements, q, inFields, noteId, hitFinder }: HitFinder) {
-    let hits: QuadHit[] = [];
-    inFields.forEach((field) => {
-      statements[noteId].hits.forEach((hit: QuadHit) => {
-        if (hitFinder(hit.quad[field], q)) {
-          hits.push(hit);
-        }
-      });
-    });
-    return hits;
   }
 
   /*
@@ -219,10 +194,10 @@ export default class Finder {
       };
 
     Object.keys(statements).forEach((noteId) => {
-      const finder = !!statements[noteId].hits ? this.findFromHits : this.findFromMdld;
+      const findsFrom: (statements) => QuadHit[] = !!statements[noteId].hits ? this.findFromHits : this.hitsFromMdld;
       let hits;
       try {
-        hits = finder({ statements, q, inFields, noteId, hitFinder });
+        hits = findsFrom({ statements, q, inFields, noteId, hitFinder });
       } catch (e) {
         throw Error(
           `Query failed with ${e} ` + JSON.stringify({ fields: inFields, q, input: statements[noteId] }, null, 2)
@@ -234,4 +209,49 @@ export default class Finder {
     });
     return matchRel;
   }
+
+
+  quadHitFromQuad(quad) {
+    const fields = allFields;
+    return { fields, quad };
+  }
+  populateHitsFromMdld(statements: MetaResultMap): MetaResultMap {
+    const found = { ...statements };
+    Object.keys(statements).map((noteId) => {
+
+      let entry = found[noteId];
+
+      found[noteId].hits = entry.mdld.map(quad => this.quadHitFromQuad(quad))
+    });
+    return found;
+  }
+
+  hitsFromMdld({ statements, q, inFields, noteId, hitFinder }: HitFinder) {
+    let hits: QuadHit[] = [];
+    statements[noteId].mdld.forEach((quad) => {
+      let fields = [];
+      inFields.forEach((field) => {
+        if (hitFinder(quad[field], q)) {
+          fields.push(field);
+        }
+      });
+      if (fields.length > 0) {
+        hits.push({ fields, quad });
+      }
+    });
+    return hits;
+  }
+
+  findFromHits({ statements, q, inFields, noteId, hitFinder }: HitFinder) {
+    let hits: QuadHit[] = [];
+    inFields.forEach((field) => {
+      statements[noteId].hits.forEach((hit: QuadHit) => {
+        if (hitFinder(hit.quad[field], q)) {
+          hits.push(hit);
+        }
+      });
+    });
+    return hits;
+  }
+
 }
