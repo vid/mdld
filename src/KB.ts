@@ -1,8 +1,8 @@
-import { MetaResultMap, Quad, Schema } from './defs';
+import { Field, MetaResultMap, Quad, Schema } from './defs';
 
 const { is, windowDoc } = require('./util');
 
-export {};
+export { };
 
 export class KB {
   concepts = {};
@@ -96,4 +96,4 @@ export class KB {
   }
 }
 
-export const allFields = ['subject', 'predicate', 'object', 'source'];
+export const allFields: Field[] = ['subject', 'predicate', 'object', 'source'];
