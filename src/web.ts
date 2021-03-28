@@ -33,28 +33,24 @@ const formatResult = ({ noteId, result, type }, cutPath) => {
   const path = finder.findNotePath(noteId);
   const title = result.hits
     ? result.hits
-        .reduce((all, f) => {
-          if (f.fields) {
-            return [...all, ...f.fields.map((x) => `${x}: ${f.quad[x]}`)];
-          } else {
-            return [...all, `${f.field}: ${f.text || f.quad[f.field]}`];
-          }
-        }, [])
-        .join('\n')
+      .reduce((all, f) => {
+        if (f.fields) {
+          return [...all, ...f.fields.map((x) => `${x}: ${f.quad[x]}`)];
+        } else {
+          return [...all, `${f.field}: ${f.text || f.quad[f.field]}`];
+        }
+      }, [])
+      .join('\n')
     : 'text result';
-  return `<a title="${title}" class="path-note-match path-note-match-${type}" href="${noteId}${
-    document.location.search
-  }" target="_blank">${cutPath ? path.replace(cutPath.what, cutPath.with(path)) : path}</a>`;
+  return `<a title="${title}" class="path-note-match path-note-match-${type}" href="${noteId}${document.location.search
+    }" target="_blank">${cutPath ? path.replace(cutPath.what, cutPath.with(path)) : path}</a>`;
 };
 /*
  * update the displayed search results
  */
-function updateSearchResultDisplay(
-  allResults,
-  cutPath?: { what: string; with: (string) => string },
-  lastPath = undefined
-) {
+function updateSearchResultDisplay(allResults, cutPath?: { what: string; with: (string) => string }, lastPath = undefined) {
   const merged = [];
+
   // merge
   // eslint-disable-next-line no-restricted-syntax
   for (const aResult of allResults) {
@@ -113,8 +109,11 @@ function updateRemoteSearch(value, localSearchResults) {
     return;
   }
   fetch(`/me/notes/search/${encodeURIComponent(value)}`).then(async (response) => {
-    const remoteResults: MetaResultMap = await response.json();
-    updateSearchResultDisplay([localSearchResults, { type: 'remote', results: remoteResults }]);
+    const { results, nb }: { results: MetaResultMap, nb: string } = await response.json();
+    updateSearchResultDisplay([localSearchResults, { type: 'remote', results }]);
+    if (nb) {
+      updateSearchResultDisplay([localSearchResults, nb]);
+    }
   });
 }
 

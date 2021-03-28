@@ -1,3 +1,5 @@
+import {escapeRegExp} from 'lodash';
+
 import { MetaResultMap, TextHit } from '../defs';
 import { KB } from '../KB';
 
@@ -27,7 +29,10 @@ export const routes = ({ errors, models, logger }) => {
     res.setHeader('Content-Type', 'application/json');
     const nrp = new NoteResultProcessor(new KB(getOrigin()));
     // FIXME why do existing note queries resolve user first?
-    const sr = new RegExp(`\\b${decodeURIComponent(search)}`, 'ig');
+
+    const re = escapeRegExp(decodeURIComponent(search));
+    
+    const sr = new RegExp(`\\b${re}`, 'ig');
     const found = await getNotesById(models, req.user.id);
     const results = {};
     for (const note of found) {
@@ -43,7 +48,7 @@ export const routes = ({ errors, models, logger }) => {
         results[noteId] = meta;
       }
     }
-    res.json(results);
+    res.json({results, nb: (re.includes('\\') ? 'Remote result is escaped and may not be complete' : undefined)});
   };
   const getNotesById = async (models, id) => {
     const notes = await models.Note.findAll({ where: { ownerId: id } });
