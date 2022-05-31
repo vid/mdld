@@ -56,10 +56,10 @@ export function resultsToNodesAndEdges(results: TFindResult) {
 }
 
 export function generateNetwork(results: TFindResult, finder: finder, where: string) {
-  return generate(results, finder, where, { layout: { hierarchical: true } });
+  return generate(results, finder, where);
 }
 export function generateHierarchy(results: TFindResult, finder: finder, where: string) {
-  return generate(results, finder, where);
+  return generate(results, finder, where, { layout: { hierarchical: true } });
 }
 
 function generate(results: TFindResult, finder: finder, where: string, options = {}) {

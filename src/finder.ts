@@ -65,7 +65,7 @@ export default class Finder {
     };
     while (tokens.hasNext()) {
       const t = tokens.next();
-      if (['table', 'summary', 'debug', 'network', 'gantt', 'count'].includes(t)) {
+      if (['table', 'summary', 'debug', 'network', 'hierarchy', 'gantt', 'count'].includes(t)) {
         output.push(t);
       } else if (t === 'concept') {
         name = tokens.next();
