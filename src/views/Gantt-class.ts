@@ -14,9 +14,6 @@ export class Gantt {
   constructor(finder) {
     this.finder = finder;
   }
-  bare(what) {
-    return what.replace(/.*#/, '');
-  }
   asLabel(what) {
     return (this.finder.findNotePath(what) || what).replace(/.*\//, '');
   }
@@ -74,7 +71,7 @@ export class Gantt {
         gantt += NL + `section ${predicates.section}`;
       }
 
-      gantt += NL + (predicates.name || label.replace(/#.*/, '').padEnd(20)) + ':' + desc;
+      gantt += NL + (predicates.name || label.replace(/.*#/, '').padEnd(20)) + ':' + desc;
     });
     gantt += `\n`;
     subjects.forEach(({ date, label, quad }) => {
