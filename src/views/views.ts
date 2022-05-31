@@ -4,7 +4,7 @@ import { display, flattenHits, getUnique } from '../util';
 import { switchables, applyToPathTitle } from '../web';
 import { UPDATING, Q_PLACEHOLDER, Q_QUERY, Q_RESULTS } from '../dom-paths';
 import { generateGantt } from './gantt';
-import { generateNetwork } from './network';
+import { generateNetwork, generateHierarchy } from './network';
 import { generateSummary } from './summary';
 
 export default class Views {
@@ -58,6 +58,11 @@ export default class Views {
             i,
             `${outputPre}<div><pre>${JSON.stringify(flattenHits(found), null, 2)}</pre></div>`
           );
+        } else if (view === 'hierarchy') {
+          const where = `hierarchy-${n}`;
+          const { output, after } = generateHierarchy(results, this.finder, where);
+          this.updateQueryResults(i, outputPre + output);
+          after();
         } else if (view === 'network') {
           const where = `network-${n}`;
           const { output, after } = generateNetwork(results, this.finder, where);
