@@ -15,7 +15,7 @@ export class Gantt {
     this.finder = finder;
   }
   bare(what) {
-    return what.replace(/#.*/, '');
+    return what.replace(/.*#/, '');
   }
   asLabel(what) {
     return (this.finder.findNotePath(what) || what).replace(/.*\//, '');
