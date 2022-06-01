@@ -80,6 +80,8 @@ export class Gantt {
       gantt += click;
     });
 
+    console.log('gantt', gantt);
+    
     return gantt;
   }
 }
