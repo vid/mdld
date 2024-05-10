@@ -6,7 +6,7 @@ It's based on ideas from Semantic Mediawiki and Linked Data,
 using minor changes to Hedgedoc 1.6 for all it offers (a lot!).
 
 The work is mainly in the directory mdld, with very minor, 
-encapsulated changes to the CodiMD code base (about ten lines of Javascript).
+encapsulated changes to the Hedgedoc code base (about ten lines of Javascript).
 
 What does it add?
 
@@ -24,7 +24,7 @@ What does it add?
 
 The quad "database" is in-memory, on the server and the browser, 
 so it can only handle thousands of notes / quads without slowing down or exploding.
-However, since it runs "alongside" CodiMD, the risk it will corrupt data is low.
+However, since it runs "alongside" Hedgedoc, the risk it will corrupt data is low.
 
 As it is, I find it priceless for my own work, but there is lots more to do. 
 I am hoping to adapt it to HedgeDoc 2, as it emerges.
