@@ -17,7 +17,7 @@ What does it add?
 * The ability to query data 
   * the query syntax is English-like
     * see mdld/src/finder.tests.ts for examples
-  * currently, table, count, network graph, gantt chart, and summary output are supported
+  * currently, table, count, network graph, gantt chart, and summary output are supported; these are derived from marked up data, they are not hard coded, so they update as the data is updated
   * reusable concepts can also be created
   * this is especially useful for project-specific to-dos and definitions within a larger collection of notes
 * The ability to search by quads, server text, and path elements using a hotkey or the document path
