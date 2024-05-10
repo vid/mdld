@@ -3,7 +3,7 @@ This is a working PoC of using Markdown with versatile quads (subject, predicate
 Its working name is mdld,
 and it's intended to enable using data in notes as a database.
 It's based on ideas from Semantic Mediawiki and Linked Data, 
-using minor changes to CodiMD 1.6 for all it offers (a lot!).
+using minor changes to Hedgedoc 1.6 for all it offers (a lot!).
 
 The work is mainly in the directory mdld, with very minor, 
 encapsulated changes to the CodiMD code base (about ten lines of Javascript).
@@ -27,7 +27,9 @@ so it can only handle thousands of notes / quads without slowing down or explodi
 However, since it runs "alongside" CodiMD, the risk it will corrupt data is low.
 
 As it is, I find it priceless for my own work, but there is lots more to do. 
-I am hoping to adapt it to CodiMD 2, well, HedgeDoc, as it emerges.
+I am hoping to adapt it to HedgeDoc 2, as it emerges.
+
+![Screenshot](Screenshot.png)
 
 Happy to hear from anyone interested. 
 Thank you.
@@ -45,3 +47,8 @@ in another terminal
 ```
 $ npm test
 ```
+
+
+## Using it with Hedgedoc
+
+That's the thing, I had to hack a few lines of core Hedgedoc to make this work, so have held back to v1.6. Am hoping Hedgedoc 2.0 (or something similar) will have some sort of compatible "extension" system.
